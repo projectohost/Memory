@@ -15,9 +15,9 @@ def edit_menu():
     edit_btn = QPushButton("Редагувати")
     
     def edit_func():
-        selected_items = list_widget.selectedItems()
+        selected_items = list_widget.selectedItems()  # список
         if selected_items:
-            selected_item = selected_items[0]
+            selected_item = selected_items[0] 
             index = list_widget.row(selected_item)
             menu.menu(edit_index=index)
             window.close()
