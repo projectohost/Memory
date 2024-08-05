@@ -4,6 +4,8 @@ from PyQt5.QtWidgets import *
 
 import database
 import menu
+import edit_menu as edit_menu_module  # Import the new edit_menu module
+
 app = QApplication([])
 window = QWidget()
 menu_btn = QPushButton("Меню")
@@ -18,6 +20,7 @@ var4_btn = QRadioButton("4")
 answer_btn = QPushButton("Відповісти")
 next_quest_btn = QPushButton("Наступне запитання")
 res_lbl = QLabel("Результат")
+edit_btn = QPushButton("Редагувати запитання")
 group = QGroupBox("Варіанти відповідей")
 
 main_line = QVBoxLayout()
@@ -41,10 +44,20 @@ group.setLayout(group_main_line)
 main_line.addWidget(group)
 main_line.addWidget(answer_btn)
 main_line.addWidget(next_quest_btn)
+main_line.addWidget(edit_btn)
 
 answers = [var1_btn, var2_btn, var3_btn, var4_btn]
 
 def set_quest():
+    if not database.questions:
+        quest_lbl.setText("Немає запитань")
+        for btn in answers:
+            btn.setText("")
+        return
+
+    if database.nomer >= len(database.questions):
+        database.nomer = len(database.questions) - 1
+
     random.shuffle(answers)
     current_question = database.questions[database.nomer]
     quest_lbl.setText(current_question["запитання"])
@@ -52,6 +65,8 @@ def set_quest():
     answers[1].setText(current_question["Не правильна відповідь1"])
     answers[2].setText(current_question["Не правильна відповідь2"])
     answers[3].setText(current_question["Не правильна відповідь3"])
+
+
 set_quest()
 res_lbl.hide()
 next_quest_btn.hide()
@@ -70,6 +85,11 @@ def ans_func():
     answer_btn.hide()
 
 def next_quest_func():
+    if database.nomer + 1 >= len(database.questions):
+        database.nomer = 0
+    else:
+        database.nomer += 1
+
     answers[0].show()
     answers[1].show()
     answers[2].show()
@@ -77,12 +97,18 @@ def next_quest_func():
     res_lbl.hide()
     next_quest_btn.hide()
     answer_btn.show()
-    database.nomer += 1
+    set_quest()
+
+
+def edit_quest_func():
+    edit_menu_module.edit_menu()  # Open the new edit menu
     set_quest()
 
 next_quest_btn.clicked.connect(next_quest_func)
 answer_btn.clicked.connect(ans_func)
 menu_btn.clicked.connect(menu.menu)
+edit_btn.clicked.connect(edit_quest_func)
+
 window.setLayout(main_line)
 window.show()
 app.exec()
